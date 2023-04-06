@@ -85,7 +85,15 @@ export default function ProductsScreen(){
     // console.log(products)
     return(
         <div className="container prod-screen">
+          <div className="row">
+            <div className="col">
             <h2>Product in stocks</h2>
+
+            </div>
+            <div className="col" style={{textAlign: "end"}}>
+              <button onClick={()=>{navigate("/addproduct")}} className="btn btn-outline-dark">+ Add Product</button>
+            </div>
+          </div>
             <hr/>
         {products && renderData()}
         <ul>
