@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import "./HomeScreen.css";
 import axios from "axios";
@@ -72,8 +72,8 @@ export default function HomeScreen() {
               <div className="icon">
                 <i className="fa fa-inbox" aria-hidden="true"></i>
               </div>
-              <a href="/searchorder" className="card-box-footer">
-                Search Orders <i className="fa fa-arrow-circle-right"></i>
+              <a href="/vieworders" className="card-box-footer">
+                View Orders <i className="fa fa-arrow-circle-right"></i>
               </a>
             </div>
           </div>
@@ -101,7 +101,7 @@ export default function HomeScreen() {
               <div className="icon">
                 <i className="fa fa-money" aria-hidden="true"></i>
               </div>
-              <a href="/" className="card-box-footer">
+              <a href="/viewstac" className="card-box-footer">
                 View More <i className="fa fa-arrow-circle-right"></i>
               </a>
             </div>
@@ -129,7 +129,7 @@ export default function HomeScreen() {
                     {or.shippingDetails[0].FirstName}</td>
                 <td>{or.TotalQuantity}</td>
                 <td>{or.TotalAmount}</td>
-                <td>View</td>
+                <td><Link to={`/order/${or._id}`}>View</Link></td>
               </tr>
                 ))}
             </tbody>

@@ -59,7 +59,7 @@ export default function ProductsScreen(){
     const end = start + itemsPerPage;
 
     return products.slice(start, end).map((product, index) => (
-        <div class="container" key={index}>
+        <div className="container" key={index}>
             <div className="row">
                 <div className="col-2">
                     {index+1}
@@ -82,7 +82,7 @@ export default function ProductsScreen(){
     
   };
 
-    console.log(products)
+    // console.log(products)
     return(
         <div className="container prod-screen">
             <h2>Product in stocks</h2>

@@ -8,6 +8,9 @@ import AddProductScreen from './Screens/AddProductScreen/AddProductScreen';
 import SearchOrderScreen from './Screens/SearchOrderScreen/SearchOrderScreen';
 import ProductsScreen from './Screens/ProductsScreen/ProductsScreen';
 import EditScreen from './Screens/EditScreen/EditScreen';
+import ViewOrderScreen from './Screens/ViewOrderScreen/ViewOrderScreen';
+import ViewOrdersScreen from './Screens/ViewOrdersScreen/ViewOrdersScreen';
+import ViewGraphScreen from './Screens/ViewGraphScreen/ViewGraphScreen';
 
 function App() {
   return (
@@ -17,7 +20,10 @@ function App() {
       <Route path='/' exact element={<HomeScreen />}/>
       <Route path='/addproduct' element={<AddProductScreen />}/>
       <Route path='/searchorder' element={<SearchOrderScreen />}/>
+      <Route path='/vieworders' element={<ViewOrdersScreen />}/>
       <Route path='/editproduct/:id' element={<EditScreen />}/>
+      <Route path='/order/:id' element={<ViewOrderScreen />}/>
+      <Route path='/viewstac' element={<ViewGraphScreen />}/>
       <Route path='/productstocks' element={<ProductsScreen />} />
       <Route path='/signin' element={<SignInScreen />} />
       <Route path='/signup' element={<SignUpScreen />}/>

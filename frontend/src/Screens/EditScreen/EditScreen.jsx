@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 export default function EditScreen() {
   const params = useParams();
+  const id = params.id
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -16,15 +17,15 @@ export default function EditScreen() {
     
     const getProduct = async () => {
       const { data } = await axios.get(
-        `http://localhost:3004/api/product/${params.id}`
+        `http://localhost:3004/api/product/${id}`
       );
       setName(data.product.ProductName);
       setBrand(data.product.ProductName)
       setDescription(data.product.Description)
-      setCategory(data.product.category)
+      setCategory(data.product.Category)
       setSubCategory(data.product.SubCategory)
       // console.log(data.TotalOrders,data.TotalOrderDelivered)
-      //   setOrder(data.orders)
+        // console.log(data.product)
     };
 
     if (!localStorage.getItem("AdminAuthToken")) {
@@ -32,11 +33,14 @@ export default function EditScreen() {
     } else {
       getProduct();
     }
-  }, [navigate, params.id]);
+  }, [id, navigate]);
 
   return (
     <>
       Edit stock
+      {
+        name && (
+
       <div className="container">
         <div>
           <input
@@ -81,6 +85,8 @@ export default function EditScreen() {
           <br />
         </div>
       </div>
+        )
+      }
     </>
   );
 }

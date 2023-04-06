@@ -1,88 +1,66 @@
-/* eslint-disable no-restricted-globals */
+import React, { useEffect, useState } from "react";
+
+import "./ViewOrderScreen.css"
+import { useParams} from "react-router-dom";
 import axios from "axios";
-import React, { useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+export default function ViewOrderScreen(){
+    const params = useParams()
+    // const navigate = useNavigate();
+    const [order,setOrder] = useState('')
+    const [user,setUser] = useState('')
+    const [packed,setPacked]= useState('')
+    const [shipped,setShipped] = useState('')
+    const [delivered,setDelivered] = useState('')
+    const [paid,setPaid] = useState('')
+    const id = params.id
+    useEffect(()=>{
+        const getOrder = async()=>{
+            const {data} = await axios.get(`http://localhost:3004/api/order/${id}`)
+            if(data.order){
+                setOrder(data.order)
+                setUser(data.user)
+                setPacked(data.order.isPacked)
+                setShipped(data.order.isShipped)
+                setDelivered(data.order.isDelivered)
+                setPaid(data.order.isPaid)
+            }else{
+    
+            }
+            }
+        getOrder()
+    },[id])
 
-export default function SearchOrderScreen() {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [email, setEmail] = useState("");
-  const [orders, setOrders] = useState("");
-
-  function handleDateChange(date) {
-    setSelectedDate(date);
-  }
-  const searchOrder = async () => {
-    try {
-      const date = selectedDate.toISOString().substring(0, 10);
-      //     const date = new Date(selectedDate);
-      //     const timestamp = date.getTime();
-      // console.log(timestamp)
-      console.log(date);
-      const config = {
-        header: {
-          "Content-Type": "application/json",
-        },
-      };
-      const { data } = await axios.get(
-        `http://localhost:3004/api/orders?email=${email}&selectedDate=${date}`,
-        config
-      );
-      if (data.orderList) {
-        setOrders(data.orderList);
-      } else {
-        console.log(data);
-      }
-    } catch (error) {
-      console.log(error);
+const updateOrder = async(name)=>{
+    try{
+        const {data} = await axios.post(`http://localhost:3004/api/order/${id}`,{name})
+        alert(data.message)
+        window.location.reload(true);
+    }catch(err){
+        console.log(err)
     }
-  };
-  console.log(selectedDate);
-  console.log(email);
-  return (
-    <>
-      {console.log(orders)}
-      <div className="container">
-        <h1>Search Orders</h1>
-        <div className="row">
-          <div className="col">
-            <label htmlFor='="search-email'>Enter Email:</label>
-            <div>
-              <input
-                id="search-email"
-                value={email}
-                name="email"
-                onChange={() => {
-                  setEmail(event.target.value);
-                }}
-              />
-            </div>
-          </div>
-          <div className="col">
-            <label htmlFor="date-input">Select a date:</label>
-            <DatePicker
-              id="date-input"
-              selected={selectedDate}
-              onChange={handleDateChange}
-            />
-          </div>
-          <div className="col">
-            <div style={{ margin: "16px" }}>
-              <button className="btn btn-dark" onClick={searchOrder}>
-                Search
-              </button>
-            </div>
-          </div>
-        </div>
+}
+
+    const handlePacked = async()=>{
+        updateOrder("packed")
+    }
+    const handleShipped = async()=>{
+        updateOrder("shipped")
+    }
+    const handlePaid = async()=>{
+        updateOrder("paid")
+    }
+    const handleDelivered = async()=>{
+        updateOrder("delivered")
+    }
+
+
+
+    return(
         <div className="container">
-          <h3>Your Result will display below</h3>
-          <div className="row">
-            {orders &&
-              orders
-                .slice(0)
-                .reverse()
-                .map((order) => (
-                  <div className=" container row" id={order._id}>
+        {/* {console.log(order)} */}
+        <h3>Order information</h3>
+        {order && 
+        <div className=" container row" id={order._id}>
                     <div className="col-sm-5 card">
                       <div className="card-body">
                         <h3>Shipping details</h3>
@@ -90,7 +68,7 @@ export default function SearchOrderScreen() {
                           <div className="col-sm-3">
                             <h6 className="mb-0">User Email :</h6>
                           </div>
-                          <div className="col-sm-9 text-secondary">{email}</div>
+                          <div className="col-sm-9 text-secondary">{user.email}</div>
                         </div>
                         <hr />
                         <div className="row">
@@ -100,6 +78,15 @@ export default function SearchOrderScreen() {
                           <div className="col-sm-9 text-secondary">
                             {order.shippingDetails[0].FirstName}{" "}
                             {order.shippingDetails[0].LastName}
+                          </div>
+                        </div>
+                        <hr />
+                        <div className="row">
+                          <div className="col-sm-3">
+                            <h6 className="mb-0">Contact No:</h6>
+                          </div>
+                          <div className="col-sm-9 text-secondary">
+                            {order.shippingDetails[0].PhoneNumber}
                           </div>
                         </div>
                         <hr />
@@ -131,6 +118,47 @@ export default function SearchOrderScreen() {
                           </div>
                         </div>
                         <hr />
+                        <div className="row">
+                            {
+                                order.isCanceled ? <div style={{color:"red"}}>Order is Canceled by user</div>: (
+                                    <>
+                                    
+                            <div className="col">
+                                {packed ? 
+                                <>Order is Packed</>
+                                :
+                                <button className="btn btn-dark" onClick={handlePacked}>Packed</button>
+                            }
+
+                            </div>
+                            <div className="col">
+                                {shipped ?
+                            <>Order is shipped</>
+                            :    
+                            <button className="btn btn-dark" onClick={handleShipped}>Shipped</button>
+                            }
+                            </div>
+                            <div className="col">
+                                {paid ? 
+                            <>User Paid</>
+                            :
+                            <button className="btn btn-dark" onClick={handlePaid}>Paid</button>
+                            }
+                            </div>
+
+                            <div className="col">
+                                {
+                                    delivered ?
+                                    <>Order Delivered successfully</>
+                                    :
+                                    <button className="btn btn-dark" onClick={handleDelivered}>Delivered</button>
+                                }
+
+                            </div>
+                                    </>
+                                )
+                            }
+                        </div>
                       </div>
                     </div>
                     <div className="col-sm-7 card">
@@ -156,7 +184,7 @@ export default function SearchOrderScreen() {
                                   <h4
                                     className="col-sm"
                                     style={{ fontSize: "15px" }}
-                                  >
+                                    >
                                     {product.ProductName} {product.SelectedSize}{" "}
                                     {product.Types[0].unit}
                                   </h4>
@@ -184,35 +212,35 @@ export default function SearchOrderScreen() {
                             </div>
                           ))}
                           <hr />
-                          <div class="row">
-                            <div class="col-sm-9">
-                              <h6 class="mb-0">Total Items</h6>
+                          <div className="row">
+                            <div className="col-sm-9">
+                              <h6 className="mb-0">Total Items</h6>
                             </div>
-                            <div class="col-sm-3 text-secondary">
+                            <div className="col-sm-3 text-secondary">
                               {order.TotalQuantity}
                             </div>
                           </div>
-                          <div class="row">
-                            <div class="col-sm-9">
-                              <h6 class="mb-0">Total Price</h6>
+                          <div className="row">
+                            <div className="col-sm-9">
+                              <h6 className="mb-0">Total Price</h6>
                             </div>
-                            <div class="col-sm-3 text-secondary">
+                            <div className="col-sm-3 text-secondary">
                               {order.TotalAmount}
                             </div>
                           </div>
-                          <div class="row">
-                            <div class="col-sm-9">
-                              <h6 class="mb-0">Total Point Recived</h6>
+                          <div className="row">
+                            <div className="col-sm-9">
+                              <h6 className="mb-0">Total Point Recived</h6>
                             </div>
-                            <div class="col-sm-3 text-secondary">
+                            <div className="col-sm-3 text-secondary">
                               {order.TotalPointsRecived}
                             </div>
                           </div>
-                          <div class="row">
-                            <div class="col-sm-9">
-                              <h6 class="mb-0">Total Points Applied</h6>
+                          <div className="row">
+                            <div className="col-sm-9">
+                              <h6 className="mb-0">Total Points Applied</h6>
                             </div>
-                            <div class="col-sm-3 text-secondary">
+                            <div className="col-sm-3 text-secondary">
                               {order.TotalPointsApply}
                             </div>
                           </div>
@@ -223,14 +251,11 @@ export default function SearchOrderScreen() {
                     </div>
                     {/* <div className="col-sm card">
                     <div className="card-body">
-                      <h3>User Details</h3>
+                    <h3>User Details</h3>
                     </div>
-                  </div> */}
+                </div> */}
                   </div>
-                ))}
-          </div>
+    }
         </div>
-      </div>
-    </>
-  );
+    )
 }

@@ -183,9 +183,9 @@ const orderSchema = new mongoose.Schema(
     userId: String,
     isDelivered: Boolean,
     isPaid: Boolean,
-    isPacked:Boolean,
-    isShipped:Boolean,
-    isCanceled:Boolean,
+    isPacked: Boolean,
+    isShipped: Boolean,
+    isCanceled: Boolean,
     TotalAmount: Number,
     TotalPointsRecived: Number,
     TotalPointsApply: Number,
@@ -213,7 +213,7 @@ const sendToken = (user, statusCode, res) => {
 
 app.post("/signin", async (req, res) => {
   const { Email, Password } = req.body;
-//   console.log(Email);
+  //   console.log(Email);
   try {
     const user = await Admin.findOne({ email: Email }).select("+password");
     // console.log(user)
@@ -264,8 +264,9 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// for fetching order with email and date
 app.get("/api/orders", async (req, res) => {
-  const { email,selectedDate } = req.query;
+  const { email, selectedDate } = req.query;
   // const date = req.body.date
   // const tstamp = parseInt(timestamp);
   // console.log(tstamp)
@@ -281,22 +282,22 @@ app.get("/api/orders", async (req, res) => {
       // const date = new Date(selectedDate)
       // console.log(year)
       const parsedDate = new Date(selectedDate);
-    parsedDate.setHours(0, 0, 0, 0);
-    const endofDay = new Date(selectedDate);
-    endofDay.setHours(23,59,59,999);
-    console.log(parsedDate)
+      parsedDate.setHours(0, 0, 0, 0);
+      const endofDay = new Date(selectedDate);
+      endofDay.setHours(23, 59, 59, 999);
+      console.log(parsedDate);
       const orderList = await Order.find({
-        userId: (user._id),
-        createdAt:{
-            $gte:parsedDate,
-            $lte:endofDay
-        }
+        userId: user._id,
+        createdAt: {
+          $gte: parsedDate,
+          $lte: endofDay,
+        },
       });
       console.log(orderList);
       if (!orderList) {
         res.send({ message: "Order Not found" });
       } else {
-        res.send({ orderList: orderList,email:email});
+        res.send({ orderList: orderList, email: email });
       }
     } else {
       res.send("User Not Found");
@@ -307,15 +308,65 @@ app.get("/api/orders", async (req, res) => {
   }
 });
 
-app.get("/api/products",async(req,res)=>{
-  const products = await Product.find({})
-  if(!products){
-    res.send({message:"Products not found"})
-  }else{
-    res.send({products:products})
-  }
-})
+// view orders by day month year
+app.get("/api/vieworders", async (req, res) => {
+  const { type, selectedDate } = req.query;
+console.log(selectedDate)
+  const parsedDate = new Date(selectedDate);
+  parsedDate.setHours(0, 0, 0, 0);
+  const endofDay = new Date(selectedDate);
+  endofDay.setHours(23, 59, 59, 999);
+  console.log(parsedDate)
+  console.log(endofDay)
+  try{
 
+    if (type === "Day") {
+      const orderList = await Order.find({
+        createdAt: {
+          $gte: parsedDate,
+          $lte: endofDay,
+        },
+      });
+      if (orderList) {
+        res.send({ orderList: orderList });
+      }
+    } else if (type === "Monthly") {
+      const date = new Date(parsedDate);
+      const month = date.getMonth() + 1;
+      const orderList = await Order.find({
+        $expr: { $eq: [{ $month: "$createdAt" }, month] },
+      });
+      if (orderList) {
+        res.send({ orderList: orderList });
+      }
+    } else if (type === "Yearly") {
+      const date = new Date(parsedDate);
+      const year = date.getFullYear();
+      const orderList = await Order.find({
+        $expr: { $eq: [{ $year: '$createdAt' }, year] },
+      });
+      if (orderList) {
+        res.send({ orderList: orderList });
+      }
+    }
+
+  }catch(err){
+    console.log(err)
+  }
+
+});
+
+// for fetching products
+app.get("/api/products", async (req, res) => {
+  const products = await Product.find({});
+  if (!products) {
+    res.send({ message: "Products not found" });
+  } else {
+    res.send({ products: products });
+  }
+});
+
+// for adding product to database
 app.post("/api/product/add", async (req, res) => {
   const {
     ProductName,
@@ -357,60 +408,80 @@ app.post("/api/product/add", async (req, res) => {
   }
 });
 
-// app.post("/api/product/add",upload.single('Image'),(req,res)=>{
-//     console.log(req.body)
-// const ProductName = req.body.ProductName;
-// const Description = req.body.Description;
-// const Price = req.body.Price;
-// const Category = req.body.Category;
-// const SubCategory = req.body.SubCategory;
-// console.log(req.body.Image.File)
-// const Image = req.file.filename;
+// getting info for dashboard
+app.get("/api/dashdata", async (req, res) => {
+  const orders = await Order.find({});
+  if (orders) {
+    const products = await Product.find({});
+    const DeliveredOrders = await Order.find({
+      isDelivered: true,
+    });
+    const DeliveredCount = DeliveredOrders.length;
 
-// const Quantity = req.body.Quantity;
-
-// const newProductData ={
-//     ProductName,
-//     Description,
-//     Price,
-//     Category,
-//     SubCategory,
-//     Image,
-//     Quantity
-// }
-
-// const newProduct = new Product(newProductData)
-// newProduct.save().then(()=>res.send({message:"product added"}))
-// .catch(err => res.send({error:err}))
-
-// })
-
-app.get("/api/dashdata",async (req,res)=>{
- const orders= await Order.find({})
- if(orders){
-  const products = await Product.find({})
-  const DeliveredOrders = await Order.find({
-    isDelivered:true
-  })
-  const DeliveredCount = DeliveredOrders.length
-
-  res.send({orders:orders,products:products,DeliveredCount:DeliveredCount})
- }
-})
-
-app.get("/api/product/:id", (req, res) => {
-  const id = req.params.id
-  const product = Product.find({"_id":id});
-  if(!product){
-    res.send({message:"no product found"})
-  }else{
-    res.send({product:product})
+    res.send({
+      orders: orders,
+      products: products,
+      DeliveredCount: DeliveredCount,
+    });
   }
 });
 
-app.post("/api/product/:id",(req,res)=>{
+// to get particular product by id
+app.get("/api/product/:id", async (req, res) => {
+  const id = req.params.id;
+  const product = await Product.findOne({ _id: id });
+  if (!product) {
+    res.send({ message: "no product found" });
+  } else {
+    res.send({ product: product });
+  }
+});
 
-})
+// to edit particular(specially quantity) product by id
+app.post("/api/product/:id", (req, res) => {});
+
+// to get particular order by id
+app.get("/api/order/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const order = await Order.findOne({ _id: id });
+    if (!order) {
+      res.send({ message: "order not found" });
+    } else {
+      const user = await User.findOne({ _id: order.userId });
+      res.send({ order: order, user: user });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.post("/api/order/:id", async (req, res) => {
+  const changePart = req.body.name;
+  const id = req.params.id;
+  const order = await Order.findOne({ _id: id });
+  if (!order) {
+    res.send({ message: "order not found" });
+  } else {
+    if (changePart === "packed") {
+      order.isPacked = true;
+      await order.save();
+      res.send({ message: "Product updated" });
+    } else if (changePart === "shipped") {
+      order.isShipped = true;
+      await order.save();
+      res.send({ message: "Product updated" });
+    } else if (changePart === "paid") {
+      order.isPaid = true;
+      await order.save();
+      res.send({ message: "Product updated" });
+    } else if (changePart === "delivered") {
+      order.isDelivered = true;
+      await order.save();
+      res.send({ message: "Product updated" });
+    }
+  }
+});
 
 app.get("/api/history", (req, res) => {});
 
