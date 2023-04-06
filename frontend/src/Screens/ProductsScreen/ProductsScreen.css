@@ -1,0 +1,15 @@
+
+.prod-screen{
+    margin-top: 40px;
+}
+
+.prod-screen ul{
+    display: flex;
+    justify-content: center;
+}
+
+.prod-screen ul li{
+    list-style: none;
+    margin: 10px;
+    cursor: pointer;
+}
