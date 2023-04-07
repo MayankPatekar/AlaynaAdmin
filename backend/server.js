@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cloudinaryModule from "cloudinary";
 const cloudinary = cloudinaryModule.v2;
+import nodemailer from "nodemailer";
 // import crypto from "crypto";
 // import path from "path";
 
@@ -210,6 +211,38 @@ const sendToken = (user, statusCode, res) => {
   const token = user.getSignedToken();
   res.status(statusCode).send({ message: "success", token });
 };
+
+const sendEmail = (options) =>{
+  const transporter = nodemailer.createTransport({
+      host: 'smtp.office365.com',
+  port: 587,
+  secure: false, // true for 465, false for other ports
+  auth: {
+      user: 'alaynaweb@outlook.com', // sender email
+      pass: 'pp4347@viksmaya' // sender password
+  }
+  });
+
+  // console.log(options.to)
+  const mailOptions = {
+      from : "alaynaweb@outlook.com",
+      to: options.to,
+      subject: options.subject,
+      html:options.text,
+  };
+
+  transporter.sendMail(mailOptions,function(err,info){
+      if(err){
+          console.log(err)
+          console.log("error")
+      }else{
+          console.log(info)
+          console.log("info")
+      }
+  });
+  
+};
+
 
 app.post("/signin", async (req, res) => {
   const { Email, Password } = req.body;
@@ -459,25 +492,40 @@ app.get("/api/order/:id", async (req, res) => {
 app.post("/api/order/:id", async (req, res) => {
   const changePart = req.body.name;
   const id = req.params.id;
+  const email = req.body.email;
   const order = await Order.findOne({ _id: id });
+  const user = await User.findOne({email:email})
   if (!order) {
     res.send({ message: "order not found" });
   } else {
     if (changePart === "packed") {
       order.isPacked = true;
       await order.save();
+      const message = `<h1>Your Order is Packed</h1><br/><p>You can expect your order within 5 days</p>`
+      await sendEmail({
+        to : "mayankpatekar112345@gmail.com",
+        subject:`#${order._id} is Packed`,
+        text : "<h1>test mail</h1>"
+    })
       res.send({ message: "Product updated" });
-    } else if (changePart === "shipped") {
+    } 
+    else if (changePart === "shipped") {
       order.isShipped = true;
       await order.save();
+      
       res.send({ message: "Product updated" });
-    } else if (changePart === "paid") {
+    } 
+    else if (changePart === "paid") {
       order.isPaid = true;
       await order.save();
+
       res.send({ message: "Product updated" });
     } else if (changePart === "delivered") {
       order.isDelivered = true;
       await order.save();
+      user.points = user.points + order.TotalPointsRecived;
+      await user.save();
+      
       res.send({ message: "Product updated" });
     }
   }

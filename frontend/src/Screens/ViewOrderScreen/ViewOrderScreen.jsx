@@ -32,7 +32,8 @@ export default function ViewOrderScreen(){
 
 const updateOrder = async(name)=>{
     try{
-        const {data} = await axios.post(`http://localhost:3004/api/order/${id}`,{name})
+      const email = user.email
+        const {data} = await axios.post(`http://localhost:3004/api/order/${id}`,{name,email})
         alert(data.message)
         window.location.reload(true);
     }catch(err){

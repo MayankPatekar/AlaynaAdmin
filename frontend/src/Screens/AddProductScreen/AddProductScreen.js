@@ -92,7 +92,7 @@ export default function AddProductScreen(){
         // console.log(type)
     }
     
-    console.log(types)
+    // console.log(types)
     return(
         <>
        {/* { console.log(Category)} */}
@@ -135,20 +135,53 @@ export default function AddProductScreen(){
         <input type="number" value={type.size} onChange={handleChange} name="size"  placeholder="size"/>
         <input type="number" value={type.price} onChange={handleChange} name="price"  placeholder="price"/>
         <input type="number" value={type.quantity} onChange={handleChange} name="quantity"  placeholder="quantity"/>
-        <button onClick={handleAddType} >Add type</button><br/>
+        <button className="btn btn-outline-dark" onClick={handleAddType} >Add type</button><br/>
 
-        {
+        <table className="table">
+              <thead>
+                <tr>
+                    <th scope="col">No.</th>
+                  <th scope="col">Unit</th>
+                  <th scope="col">Size</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+
+            {types && types.map((type,index) => (
+              <tr key={index}>
+                <th className="col">{index + 1}</th>
+                <th className="col">
+                {type.unit}
+                </th>
+                <th className="col">
+                {type.size}
+                </th>
+                <th className="col">
+                {type.price}
+                </th>
+                <th className="col">
+                {type.quantity}
+                </th> 
+              </tr>
+            ))
+        
+        }
+              </tbody>
+            </table>
+        {/* {
             types? types.map((type) => (
                 <div>{type.type} , {type.unit} , {type.size}, {type.price}, {type.quantity}</div>
               )):<h1>list will be added here</h1>
-        }
+        } */}
         <br/>
 
 
         {/* <input type="text" placeholder="color" />
         <input type="file"  />
         <button  >Add color</button> */}
-        <input type="submit" onClick={addProduct}/>
+        <input type="submit" className="btn btn-dark" onClick={addProduct}/>
 
         </div>
 

@@ -87,7 +87,7 @@ export default function HomeScreen() {
               <div className="icon">
                 <i className="fa fa-dropbox" aria-hidden="true"></i>
               </div>
-              <a href="/" className="card-box-footer">
+              <a href="/searchorder" className="card-box-footer">
                 Search Orders <i className="fa fa-arrow-circle-right"></i>
               </a>
             </div>
