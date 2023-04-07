@@ -115,6 +115,7 @@ export default function HomeScreen() {
                 <th scope="col">ID</th>
                 <th scope="col">Full Name</th>
                 <th scope="col">Total Quantity</th>
+                <th scope="col">Status</th>
                 <th scope="col">Amount</th>
                 <th></th>
               </tr>
@@ -126,8 +127,11 @@ export default function HomeScreen() {
               <tr key={or._id}>
                 <th scope="row">{or._id}</th>
                 <td>{or.shippingDetails[0].FirstName}{" "}
-                    {or.shippingDetails[0].FirstName}</td>
+                    {or.shippingDetails[0].LastName}</td>
                 <td>{or.TotalQuantity}</td>
+                <td>
+                {or.isCanceled?<>Order Cancel</>:or.isDelivered?<>Order Delivered</>:or.isShipped?<>Order Shipped</>:or.isPacked?<>Order Packed</>:<>Order Confirm</>}
+                </td>
                 <td>{or.TotalAmount}</td>
                 <td><Link to={`/order/${or._id}`}>View</Link></td>
               </tr>

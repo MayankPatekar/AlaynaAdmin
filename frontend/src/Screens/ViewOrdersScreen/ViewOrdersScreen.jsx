@@ -119,9 +119,9 @@ export default function ViewOrdersScreen() {
                 <td>{or.shippingDetails[0].FirstName}{" "}
                     {or.shippingDetails[0].FirstName}</td>
                 <td>{or.TotalQuantity}</td>
-                <td>{
-                    <div>Confirm order</div>
-                    }</td>
+                <td>
+                    {or.isCanceled?<>Order Cancel</>:or.isDelivered?<>Order Delivered</>:or.isShipped?<>Order Shipped</>:or.isPacked?<>Order Packed</>:<>Order Confirm</>}
+                    </td>
                 <td>{or.TotalAmount}</td>
                 <td><Link to={`/order/${or._id}`}>View</Link></td>
               </tr>
