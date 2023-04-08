@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 export default function EditScreen() {
   const params = useParams();
   const id = params.id;
+  // const [visible,setVisible] = useState(false)
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -27,9 +28,20 @@ export default function EditScreen() {
       [name]: value,
     });
   };
-  const handleAddType = (e) => {
+  const config ={
+    header :{
+      "Content-Type":"application/json"
+    }
+  }
+  const handleAddType = async() => {
+    console.log(type)
+    await axios.post(`http://localhost:3004/api/type/add?id=${id}`,{type},config).then((res)=>{
+      alert(`${res.data.message}`)
+      window.location.reload(true);
+      // navigate(`/editproduct/${id}`);
+    })
     // e.preventDefault()
-    setTypes((types) => [...types, type]);
+    // setTypes((types) => [...types, type]);
     // console.log(type)
   };
 
@@ -55,6 +67,24 @@ export default function EditScreen() {
     }
   }, [id, navigate]);
 
+  const handleUpdateProduct =async()=>{
+    await axios.post(`http://localhost:3004/api/product/${id}`,{name,description,brand,category,subCategory}).then((res)=>{
+      alert(`${res.data.message}`)
+      window.location.reload(true);
+    }).catch(err=>{console.log(err)})
+  }
+
+  const handleTypeDelete = async (typeid) => {
+    await axios
+      .post(`http://localhost:3004/api/type/delete?id=${id}&typeid=${typeid}`)
+      .then((res) => {
+        alert(`${res.data.message}`);
+        window.location.reload(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   // console.log(types)
   return (
     <>
@@ -102,6 +132,9 @@ export default function EditScreen() {
               placeholder="SubCategory"
             />
             <br />
+            <button className="btn btn-dark" onClick={handleUpdateProduct}>Update</button>
+            <br />
+            <bt />
             <table className="table">
               <thead>
                 <tr>
@@ -112,32 +145,63 @@ export default function EditScreen() {
                 </tr>
               </thead>
               <tbody>
-
-            {types.map((type) => (
-              <tr key={type._id}>
-                <th className="col">
-                {type.unit}
-                </th>
-                <th className="col">
-                {type.size}
-                </th>
-                <th className="col">
-                {type.price}
-                </th>
-                <th className="col">
-                {type.quantity}
-                </th> 
-              </tr>
-            ))}
+                {types.map((type) => (
+                  <tr key={type._id}>
+                    <th className="col">{type.unit}</th>
+                    <th className="col">{type.size}</th>
+                    <th className="col">{type.price}</th>
+                    <th className="col">{type.quantity}</th>
+                    <button
+                      onClick={() => {
+                        navigate(`/product/edittype/${type._id}?id=${id}`);
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleTypeDelete(type._id);
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </tr>
+                ))}
               </tbody>
             </table>
-            
 
+            {}
 
+            <input
+              type="text"
+              value={type.unit}
+              onChange={handleChange}
+              name="unit"
+              placeholder="unit"
+            />
+            <input
+              type="number"
+              value={type.size}
+              onChange={handleChange}
+              name="size"
+              placeholder="size"
+            />
+            <input
+              type="number"
+              value={type.price}
+              onChange={handleChange}
+              name="price"
+              placeholder="price"
+            />
+            <input
+              type="number"
+              value={type.quantity}
+              onChange={handleChange}
+              name="quantity"
+              placeholder="quantity"
+            />
 
-
-
-
+            <button onClick={handleAddType}>Add Type</button>
 
             {/* {types.map((type) => (
               <>

@@ -28,6 +28,13 @@ export default function ProductsScreen(){
     }
     },[navigate])
 
+    const handleProductDelete = async(id)=>{
+      await axios.post(`http://localhost/api/productdelete/${id}`).then((res)=>{
+        alert(`${res.data.message}`)
+        window.location.reload(true);
+      }).catch(err=>{console.log(err)})
+    }
+
     const [currentPage, setCurrentPage] = useState(1);
 
   const pageCount = Math.ceil(products.length / itemsPerPage);
@@ -73,7 +80,7 @@ export default function ProductsScreen(){
                 </div>
                 <div className="col-2">
                     <button className="btn btn-dark" onClick={()=>handleEditClick(product._id)} >Edit</button>
-                    <button className="btn btn-outline-dark">Delete</button>
+                    <button className="btn btn-outline-dark" onClick={()=>handleProductDelete(product._id)}>Delete</button>
                 </div>
             </div>
             <hr/>

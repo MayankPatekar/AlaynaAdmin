@@ -11,6 +11,7 @@ import EditScreen from './Screens/EditScreen/EditScreen';
 import ViewOrderScreen from './Screens/ViewOrderScreen/ViewOrderScreen';
 import ViewOrdersScreen from './Screens/ViewOrdersScreen/ViewOrdersScreen';
 import ViewGraphScreen from './Screens/ViewGraphScreen/ViewGraphScreen';
+import EditTypeScreen from './Screens/EditTypeScreen/EditTypeScreen';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
       <Route path='/order/:id' element={<ViewOrderScreen />}/>
       <Route path='/viewstac' element={<ViewGraphScreen />}/>
       <Route path='/productstocks' element={<ProductsScreen />} />
+      <Route path='/product/edittype/:typeid' element={<EditTypeScreen/>} />
       <Route path='/signin' element={<SignInScreen />} />
       <Route path='/signup' element={<SignUpScreen />}/>
     </Routes>

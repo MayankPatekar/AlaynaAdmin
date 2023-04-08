@@ -242,7 +242,9 @@ const sendEmail = (options) =>{
   });
   
 };
-
+// ---------------------------------------------------//
+// ---------------ROUTES-------------------------------//
+// ---------------------------------------------------//
 
 app.post("/signin", async (req, res) => {
   const { Email, Password } = req.body;
@@ -296,6 +298,10 @@ app.post("/signup", async (req, res) => {
     console.log(err);
   }
 });
+
+// ---------------------------------------------------//
+// ---------ALL ORDER RELATED ROUTES---------------//
+// ---------------------------------------------------//
 
 // for fetching order with email and date
 app.get("/api/orders", async (req, res) => {
@@ -389,90 +395,6 @@ console.log(selectedDate)
 
 });
 
-// for fetching products
-app.get("/api/products", async (req, res) => {
-  const products = await Product.find({});
-  if (!products) {
-    res.send({ message: "Products not found" });
-  } else {
-    res.send({ products: products });
-  }
-});
-
-// for adding product to database
-app.post("/api/product/add", async (req, res) => {
-  const {
-    ProductName,
-    ProductBrand,
-    Description,
-    Category,
-    SubCategory,
-    Types,
-    productImg,
-  } = req.body;
-
-  console.log(req.body);
-  try {
-    if (productImg) {
-      const uploadRes = await cloudinary.uploader.upload(productImg, {
-        upload_preset: "online-shop",
-      });
-
-      if (uploadRes) {
-        const newProduct = new Product({
-          ProductName,
-          ProductBrand,
-          Description,
-          Category,
-          SubCategory,
-          Types,
-          Image: uploadRes,
-        });
-        console.log(uploadRes);
-
-        const savedProduct = await newProduct.save();
-
-        res.status(200).send(savedProduct);
-      }
-    }
-  } catch (err) {
-    console.log(err);
-    res.status(500).send(err);
-  }
-});
-
-// getting info for dashboard
-app.get("/api/dashdata", async (req, res) => {
-  const orders = await Order.find({});
-  if (orders) {
-    const products = await Product.find({});
-    const DeliveredOrders = await Order.find({
-      isDelivered: true,
-    });
-    const DeliveredCount = DeliveredOrders.length;
-
-    res.send({
-      orders: orders,
-      products: products,
-      DeliveredCount: DeliveredCount,
-    });
-  }
-});
-
-// to get particular product by id
-app.get("/api/product/:id", async (req, res) => {
-  const id = req.params.id;
-  const product = await Product.findOne({ _id: id });
-  if (!product) {
-    res.send({ message: "no product found" });
-  } else {
-    res.send({ product: product });
-  }
-});
-
-// to edit particular(specially quantity) product by id
-app.post("/api/product/:id", (req, res) => {});
-
 // to get particular order by id
 app.get("/api/order/:id", async (req, res) => {
   const id = req.params.id;
@@ -531,8 +453,243 @@ app.post("/api/order/:id", async (req, res) => {
   }
 });
 
-app.get("/api/history", (req, res) => {});
+// ---------------------------------------------------//
+// -----------ALL PRODUCT RELATED ROUTES-------------//
+// ---------------------------------------------------//
 
+// for fetching products
+app.get("/api/products", async (req, res) => {
+  const products = await Product.find({});
+  if (!products) {
+    res.send({ message: "Products not found" });
+  } else {
+    res.send({ products: products });
+  }
+});
+
+// for adding product to database
+app.post("/api/product/add", async (req, res) => {
+  const {
+    ProductName,
+    ProductBrand,
+    Description,
+    Category,
+    SubCategory,
+    Types,
+    productImg,
+  } = req.body;
+
+  console.log(req.body);
+  try {
+    if (productImg) {
+      const uploadRes = await cloudinary.uploader.upload(productImg, {
+        upload_preset: "online-shop",
+      });
+
+      if (uploadRes) {
+        const newProduct = new Product({
+          ProductName,
+          ProductBrand,
+          Description,
+          Category,
+          SubCategory,
+          Types,
+          Image: uploadRes,
+        });
+        console.log(uploadRes);
+
+        const savedProduct = await newProduct.save();
+
+        res.status(200).send(savedProduct);
+      }
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send(err);
+  }
+});
+
+// to get particular product by id
+app.get("/api/product/:id", async (req, res) => {
+  const id = req.params.id;
+  const product = await Product.findOne({ _id: id });
+  if (!product) {
+    res.send({ message: "no product found" });
+  } else {
+    res.send({ product: product });
+  }
+});
+
+// to edit particular(specially quantity) product by id
+app.post("/api/product/:id",async(req, res) => {
+  const id = req.params.id;
+  const name = req.body.name;
+  const description = req.body.description
+  const brand = req.body.brand
+  var category;
+  if(req.body.category.includes(",")){
+     category = req.body.category.split(",")
+  }else{
+     category = [req.body.category]
+  }
+  // const category = req.body.category
+  const subcategory = req.body.subCategory
+  const product = await Product.findOne({_id:id})
+  product.ProductName=name,
+  product.Description = description,
+  product.ProductBrand = brand,
+  product.Category = category
+  product.SubCategory = subcategory
+  product.save()
+  res.send({message:"Product update successfully"})
+});
+
+app.post("/api/productdelete/:id",async(req,res)=>{
+  const id = req.params.id;
+  try{
+
+    await Product.deleteOne({_id:id})
+    res.send({message:"Product delete"})
+  }catch(err){
+    console.log(err)
+  }
+})
+
+// ---------------------------------------------------//
+// ----------ALL TYPE RELATED ROUTES---------------//
+// ---------------------------------------------------//
+
+// get type
+app.get("/api/product/type",async(req,res)=>{
+  const {id,typeid} = req.query;
+
+  console.log(id)
+  try{
+
+    const product = await Product.findOne({_id:id})
+    console.log(product)
+    product.Types.forEach((type)=>{
+      console.log(type._id.toString())
+      if(type._id.toString()===typeid){
+        // console.log("type is here")
+        console.log(type)
+        res.send({Type:type})
+      }
+    })
+  }catch(err){
+    console.log("err")
+  }
+
+
+})
+// edit type
+app.post("/api/product/type",async(req,res)=>{
+  const {id,typeid} = req.query;
+  const {unit,size,quantity,price} = req.body;
+  // console.log(id," ",typeid)
+  // console.log("from backend ")
+  try{
+
+    const product = await Product.findOne({_id:id})
+    product.Types.forEach(async (type)=>{
+      if(type._id.toString()===typeid){
+        type.size = size,
+        type.unit = unit,
+        type.quantity = quantity,
+        type.price = price,
+        await product.save();
+        res.send({message:"Type updated successfully"})
+        
+      }
+    })
+  }catch(err){
+    res.send(err)
+  }
+
+})
+
+// delete type
+app.post("/api/type/delete",async(req,res)=>{
+  const {id,typeid} = req.query;
+  const product = await Product.findOne({_id:id})
+  var typeSize=0; 
+  product.Types.forEach((type)=>{
+    if(type._id.toString()===typeid){
+      typeSize = type.size;
+    }
+  })
+  // console.log(typeSize)
+  // Product.updateOne(
+  //   { _id: id }, // Filter to match the product document by ID
+  //   { $pull: { Types: { size: typeSize } } } // Use $pull to remove the Types object with the matching typeNo
+  //   // (err, result) => {
+  //   //   if (err) {
+  //   //     console.log('Error removing Types object:', err);
+  //   //     return;
+  //   //   }
+  //   //   console.log('Types object removed:', result);
+  //   // }
+  // );
+  if(product.Types.length > 1){
+    product.Types = product.Types.filter(type => type.size !== typeSize);
+    product.save();
+    res.send({message:"Type delete successfully"})
+
+  }else{
+    res.send({message:"You atleast have to keep one type"})
+  }
+  // product.Types.deleteOne({_id:typeid})
+
+})
+// add type
+app.post("/api/type/add",async(req,res)=>{
+  const {id} = req.query;
+  // console.log(req.body.type)
+  // const {unit,size,price,quantity} = req.body.type;
+  const unit = req.body.type.unit
+  const size = Number(req.body.type.size)
+  const price = Number(req.body.type.price)
+  const quantity = Number(req.body.type.quantity)
+  // console.log(type)
+  // console.log(unit,size,price,quantity)
+  const product = await Product.findOne({_id:id})
+  if(!product.Types){
+    product.Types = []
+  }
+  const newType = {
+    // typeNo: 0,
+    unit: unit,
+    size: size,
+    price: price,
+    quantity: quantity,
+  };
+  product.Types.push(newType)
+  product.save();
+  res.send({message:"Type added successfully"})
+
+})
+
+// ---------------------------------------------------//
+// getting info for dashboard
+app.get("/api/dashdata", async (req, res) => {
+  const orders = await Order.find({});
+  if (orders) {
+    const products = await Product.find({});
+    const DeliveredOrders = await Order.find({
+      isDelivered: true,
+    });
+    const DeliveredCount = DeliveredOrders.length;
+
+    res.send({
+      orders: orders,
+      products: products,
+      DeliveredCount: DeliveredCount,
+    });
+  }
+});
+
+app.get("/api/history", (req, res) => {});
+// ---------------------------------------------------//
 const port = process.env.PORT || 3004;
 app.listen(port, function () {
   console.log("Admin Server is running on port 3004...");

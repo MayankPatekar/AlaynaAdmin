@@ -117,7 +117,7 @@ export default function ViewOrdersScreen() {
               <tr key={or._id}>
                 <th scope="row">{or._id}</th>
                 <td>{or.shippingDetails[0].FirstName}{" "}
-                    {or.shippingDetails[0].FirstName}</td>
+                    {or.shippingDetails[0].LastName}</td>
                 <td>{or.TotalQuantity}</td>
                 <td>
                     {or.isCanceled?<>Order Cancel</>:or.isDelivered?<>Order Delivered</>:or.isShipped?<>Order Shipped</>:or.isPacked?<>Order Packed</>:<>Order Confirm</>}
