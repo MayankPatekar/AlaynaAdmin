@@ -19,12 +19,12 @@ export default function EditTypeScreen() {
   //   })
 
   const typeid = params.typeid;
-console.log(typeid,id)
+// console.log(typeid,id)
   useEffect(() => {
     try {
       const getType = async () => {
         const { data } = await axios.get(
-          `http://localhost:3004/api/product/type?id=${id}&typeid=${typeid}`
+          `http://localhost:3004/api/type/get?id=${id}&typeid=${typeid}`
         );
         // console.log(data.Type)
         // setType(Type)
@@ -43,7 +43,7 @@ console.log(typeid,id)
   }, [id, typeid]);
 
   const handleUpdateType = async() => {
-    await axios.post(`http://localhost:3004/api/product/type?id=${id}&typeid=${typeid}`,{unit,size,quantity,price}).then((res)=>{
+    await axios.post(`http://localhost:3004/api/type/post?id=${id}&typeid=${typeid}`,{unit,size,quantity,price}).then((res)=>{
         alert(`${res.data.message}`)
         // navigate("/profile")
         
@@ -55,7 +55,7 @@ console.log(typeid,id)
     <>
       <h2>Types</h2>
       {/* <input type="text" value={type.type} onChange={handleChange} name="type"  placeholder="type"/> */}
-      { (
+      {unit && (
         <>
           <input
             type="text"

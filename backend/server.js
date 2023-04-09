@@ -530,7 +530,7 @@ app.post("/api/product/:id",async(req, res) => {
   if(req.body.category.includes(",")){
      category = req.body.category.split(",")
   }else{
-     category = [req.body.category]
+     category = req.body.category
   }
   // const category = req.body.category
   const subcategory = req.body.subCategory
@@ -547,7 +547,7 @@ app.post("/api/product/:id",async(req, res) => {
 app.post("/api/productdelete/:id",async(req,res)=>{
   const id = req.params.id;
   try{
-
+console.log(id)
     await Product.deleteOne({_id:id})
     res.send({message:"Product delete"})
   }catch(err){
@@ -560,10 +560,10 @@ app.post("/api/productdelete/:id",async(req,res)=>{
 // ---------------------------------------------------//
 
 // get type
-app.get("/api/product/type",async(req,res)=>{
+app.get("/api/type/get",async(req,res)=>{
   const {id,typeid} = req.query;
 
-  console.log(id)
+  // console.log(id)
   try{
 
     const product = await Product.findOne({_id:id})
@@ -583,7 +583,7 @@ app.get("/api/product/type",async(req,res)=>{
 
 })
 // edit type
-app.post("/api/product/type",async(req,res)=>{
+app.post("/api/type/post",async(req,res)=>{
   const {id,typeid} = req.query;
   const {unit,size,quantity,price} = req.body;
   // console.log(id," ",typeid)

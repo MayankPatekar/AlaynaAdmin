@@ -29,7 +29,7 @@ export default function ProductsScreen(){
     },[navigate])
 
     const handleProductDelete = async(id)=>{
-      await axios.post(`http://localhost/api/productdelete/${id}`).then((res)=>{
+      await axios.post(`http://localhost:3004/api/productdelete/${id}`).then((res)=>{
         alert(`${res.data.message}`)
         window.location.reload(true);
       }).catch(err=>{console.log(err)})
