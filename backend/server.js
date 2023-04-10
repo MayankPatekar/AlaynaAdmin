@@ -6,6 +6,8 @@ import jwt from "jsonwebtoken";
 import cloudinaryModule from "cloudinary";
 const cloudinary = cloudinaryModule.v2;
 import nodemailer from "nodemailer";
+import * as dotenv from 'dotenv' 
+dotenv.config()
 // import crypto from "crypto";
 // import path from "path";
 
@@ -15,7 +17,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 
 mongoose.connect(
-  "mongodb+srv://alayna2k23:XLrO7pHUEKiQREmq@cluster0.2ygko3y.mongodb.net/alayna?retryWrites=true&w=majority",
+  process.env.mongoose_connect,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -179,6 +181,7 @@ const Product = new mongoose.model("Product", productSchema);
 // order schema
 const orderSchema = new mongoose.Schema(
   {
+    OrderId:{type:String,require:true},
     Items: [],
     shippingDetails: [],
     userId: String,
@@ -218,8 +221,8 @@ const sendEmail = (options) =>{
   port: 587,
   secure: false, // true for 465, false for other ports
   auth: {
-      user: 'alaynaweb@outlook.com', // sender email
-      pass: 'pp4347@viksmaya' // sender password
+      user: process.env.outLook_user, // sender email
+      pass: process.env.outLook_pass // sender password
   }
   });
 
@@ -423,18 +426,23 @@ app.post("/api/order/:id", async (req, res) => {
     if (changePart === "packed") {
       order.isPacked = true;
       await order.save();
-      const message = `<h1>Your Order is Packed</h1><br/><p>You can expect your order within 5 days</p>`
+      const message = `Dear <br/> <bold>${user.FirstName} ${user.LastName},</bold><br><p>Your order id #${order.OrderId} is been packed and <br /> will be delivered to you soon.<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at <a>alayna2k23@gmail.com</a></p><h6>Happy shopping,<br/>Havve a great day.</h6>`
       await sendEmail({
         to : "mayankpatekar112345@gmail.com",
-        subject:`#${order._id} is Packed`,
-        text : "<h1>test mail</h1>"
+        subject:`#${order.OrderId} Your Alayna's order is been packed`,
+        text : message
     })
       res.send({ message: "Product updated" });
     } 
     else if (changePart === "shipped") {
       order.isShipped = true;
       await order.save();
-      
+      const message = `Dear <br/> <bold>${user.FirstName} ${user.LastName},</bold><br><p>Your order id <bold>#${order.OrderId}</bold> is been shipped and <br /> will be delivered to you soon.<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at <a>alayna2k23@gmail.com</a></p><h6>Happy shopping,<br/>Havve a great day.</h6>`
+      await sendEmail({
+        to : "mayankpatekar112345@gmail.com",
+        subject:`#${order.OrderId} Your Alayna's order is been shipped`,
+        text : message
+    })
       res.send({ message: "Product updated" });
     } 
     else if (changePart === "paid") {
@@ -447,7 +455,18 @@ app.post("/api/order/:id", async (req, res) => {
       await order.save();
       user.points = user.points + order.TotalPointsRecived;
       await user.save();
+      var message;
+      if(TotalPointsRecived>0){
+        message = `Dear <br/> <bold>${user.FirstName} ${user.LastName},</bold><br><p>Your order id <bold>#${order.OrderId}</bold> is been delivered and <br /> ${TotalPointsRecived} points are added to your account.<br/> We hope that you are satisfied by our service.<br/>Check profile section to see how much points you have.<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at <a>alayna2k23@gmail.com</a></p><h6>Happy shopping,<br/>Havve a great day.</h6>`
+      }else{
+        message = `Dear <br/> <bold>${user.FirstName} ${user.LastName},</bold><br><p>Your order id <bold>#${order.OrderId}</bold> is been delivered.<br />We hope that you are satisfied by our service..<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at <a>alayna2k23@gmail.com</a></p><h6>Happy shopping,<br/>Havve a great day.</h6>`
+      }
       
+      await sendEmail({
+        to : "mayankpatekar112345@gmail.com",
+        subject:`#${order.OrderId} Your Alayna's order is been delivered`,
+        text : message
+    })
       res.send({ message: "Product updated" });
     }
   }
