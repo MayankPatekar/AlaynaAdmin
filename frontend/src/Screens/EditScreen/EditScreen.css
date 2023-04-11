@@ -1,0 +1,15 @@
+.edit-prod-div .card{
+    margin: 50px auto;
+    max-width: 600px;
+}
+
+.edit-prod-div input{
+    width: 100%;
+    border: 1px solid black;
+margin-top: 10px;
+}
+
+.edit-prod-div textarea{
+    margin-top: 10px;
+    width: 100%;
+}

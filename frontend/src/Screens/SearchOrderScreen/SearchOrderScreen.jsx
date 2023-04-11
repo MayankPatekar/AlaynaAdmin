@@ -93,7 +93,7 @@ export default function SearchOrderScreen() {
           .reverse().map((or)=>(
 
               <tr key={or._id}>
-                <th scope="row">{or._id}</th>
+                <th scope="row">{or.OrderId}</th>
                 <td>{or.shippingDetails[0].FirstName}{" "}
                     {or.shippingDetails[0].LastName}</td>
                 <td>{or.TotalQuantity}</td>

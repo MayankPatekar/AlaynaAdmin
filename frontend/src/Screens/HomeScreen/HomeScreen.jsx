@@ -40,6 +40,11 @@ export default function HomeScreen() {
       getProduct();
     }
   }, [navigate]);
+  const logout =()=>{
+    localStorage.removeItem("AdminAuthToken")
+    alert(`You're Sign out`)
+    navigate("/signin");
+  }
 
   return (
     <>
@@ -47,6 +52,38 @@ export default function HomeScreen() {
         href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"
         rel="stylesheet"
       />
+<nav className="navbar navbar-expand-lg navbar-light bg-light" style={{height:"64px"}}>
+  <div className="container">
+    {/* <a className="navbar-brand me-2" href="https://mdbgo.com/"> */}
+      <img
+        src="/logo/logo1.png"
+        height="16"
+        alt="MDB Logo"
+        loading="lazy"
+        style={{marginTop: "-1px",width: "100px",
+        height: "auto"}}
+      />
+    {/* </a> */}
+
+    
+
+    <div className="collapse navbar-collapse" id="navbarButtonsExample">
+      <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+        <li className="nav-item">
+          <a className="nav-link" href="/">Dashboard</a>
+        </li>
+      </ul>
+
+      <div className="d-flex align-items-center">
+       
+        <button type="button" className="btn btn-primary me-3" onClick={logout}>
+          Sign out
+        </button>
+        
+      </div>
+    </div>
+  </div>
+</nav>
       <div className="container">
         <div className="row">
           <div className="col-lg-3 col-sm-6">
@@ -125,7 +162,7 @@ export default function HomeScreen() {
           .reverse().map((or)=>(
 
               <tr key={or._id}>
-                <th scope="row">{or._id}</th>
+                <th scope="row">{or.OrderId}</th>
                 <td>{or.shippingDetails[0].FirstName}{" "}
                     {or.shippingDetails[0].LastName}</td>
                 <td>{or.TotalQuantity}</td>

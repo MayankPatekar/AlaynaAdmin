@@ -426,7 +426,8 @@ app.post("/api/order/:id", async (req, res) => {
     if (changePart === "packed") {
       order.isPacked = true;
       await order.save();
-      const message = `Dear <br/> <bold>${user.FirstName} ${user.LastName},</bold><br><p>Your order id #${order.OrderId} is been packed and <br /> will be delivered to you soon.<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at <a>alayna2k23@gmail.com</a></p><h6>Happy shopping,<br/>Havve a great day.</h6>`
+      console.log(user)
+      const message = `Dear <br/> ${user.fname} ${user.lname},<br><p>Your order id #${order.OrderId} is been packed and <br /> will be delivered to you soon.<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at `+`<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>`+`</p>`+`<h3>Happy shopping,<br/>Havve a great day.</h3>`
       await sendEmail({
         to : "mayankpatekar112345@gmail.com",
         subject:`#${order.OrderId} Your Alayna's order is been packed`,
@@ -456,8 +457,8 @@ app.post("/api/order/:id", async (req, res) => {
       user.points = user.points + order.TotalPointsRecived;
       await user.save();
       var message;
-      if(TotalPointsRecived>0){
-        message = `Dear <br/> <bold>${user.FirstName} ${user.LastName},</bold><br><p>Your order id <bold>#${order.OrderId}</bold> is been delivered and <br /> ${TotalPointsRecived} points are added to your account.<br/> We hope that you are satisfied by our service.<br/>Check profile section to see how much points you have.<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at <a>alayna2k23@gmail.com</a></p><h6>Happy shopping,<br/>Havve a great day.</h6>`
+      if(order.TotalPointsRecived>0){
+        message = `Dear <br/> <bold>${user.FirstName} ${user.LastName},</bold><br><p>Your order id <bold>#${order.OrderId}</bold> is been delivered and <br /> ${order.TotalPointsRecived} points are added to your account.<br/> We hope that you are satisfied by our service.<br/>Check profile section to see how much points you have.<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at <a>alayna2k23@gmail.com</a></p><h6>Happy shopping,<br/>Havve a great day.</h6>`
       }else{
         message = `Dear <br/> <bold>${user.FirstName} ${user.LastName},</bold><br><p>Your order id <bold>#${order.OrderId}</bold> is been delivered.<br />We hope that you are satisfied by our service..<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at <a>alayna2k23@gmail.com</a></p><h6>Happy shopping,<br/>Havve a great day.</h6>`
       }
@@ -672,19 +673,34 @@ app.post("/api/type/add",async(req,res)=>{
   // console.log(type)
   // console.log(unit,size,price,quantity)
   const product = await Product.findOne({_id:id})
+  
   if(!product.Types){
     product.Types = []
   }
-  const newType = {
-    // typeNo: 0,
-    unit: unit,
-    size: size,
-    price: price,
-    quantity: quantity,
-  };
-  product.Types.push(newType)
-  product.save();
-  res.send({message:"Type added successfully"})
+  // product.Types.forEach(type=>{
+    // const yes = product.Types.findOne({size:size})
+    var yes = false; 
+    product.Types.forEach(type=>{
+      if(type.size === size){
+        yes = true
+      }
+    })
+    if(!yes){
+
+     const newType = {
+        // typeNo: 0,
+        unit: unit,
+        size: size,
+        price: price,
+        quantity: quantity,
+      };
+      product.Types.push(newType)
+      product.save();
+      res.send({message:"Type added successfully"})
+    }else{
+      res.send({message:"Type is already exist"})
+    }
+  // })
 
 })
 

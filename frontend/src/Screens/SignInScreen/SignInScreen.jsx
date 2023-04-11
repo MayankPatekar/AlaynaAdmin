@@ -2,7 +2,6 @@ import React,{useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate} from  'react-router-dom';
 import './SignInScreen.css';
-import { toast } from "react-toastify";
 
 
 export default function SignInScreen() {
@@ -49,7 +48,7 @@ const config ={
       const {data} = await axios.post("http://localhost:3004/signin",user,config);
       localStorage.setItem("AdminAuthToken",data.token);
       navigate("/")
-      toast.success(`Wellcome , You are Sign in`,{ autoClose: 2000 })
+      alert(`Wellcome , You are Sign in`)
     }catch(error){
       alert(error.response.data.message);
     }

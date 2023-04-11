@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import "./EditScreen.css"
+
 export default function EditScreen() {
   const params = useParams();
   const id = params.id;
@@ -68,10 +70,15 @@ export default function EditScreen() {
   }, [id, navigate]);
 
   const handleUpdateProduct =async()=>{
-    await axios.post(`http://localhost:3004/api/product/${id}`,{name,description,brand,category,subCategory}).then((res)=>{
-      alert(`${res.data.message}`)
-      window.location.reload(true);
-    }).catch(err=>{console.log(err)})
+    if(name && description && brand && category && subCategory){
+
+      await axios.post(`http://localhost:3004/api/product/${id}`,{name,description,brand,category,subCategory}).then((res)=>{
+        alert(`${res.data.message}`)
+        window.location.reload(true);
+      }).catch(err=>{console.log(err)})
+    }else{
+      alert("Fill complete details")
+    }
   }
 
   const handleTypeDelete = async (typeid) => {
@@ -89,48 +96,64 @@ export default function EditScreen() {
   return (
     <>
       {name && (
-        <div className="container">
+        <div className="container edit-prod-div">
+          <div className="card" style={{padding: "25px 20px"}}>
+
           <h2>Edit Product</h2>
           <div>
-            <input
+            <div className="row">
+              <div className="col">
+              <input
               type="text"
               name="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Productname"
-            />
-            <br />
-            <input
+              />
+              </div>
+              <div className="col">
+              <input
               type="text"
               name="brand"
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
               placeholder="ProductBrand"
             />
-            <br />
-            <textarea
+              </div>
+            </div>
+            <div className="row">
+              <div className="col">
+              <textarea
               type="text"
               name="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Description"
             />
-            <br />
-            <input
+              </div>
+            
+            </div>
+            <div className="row">
+              <div className="col">
+              <input
               type="text"
               name="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               placeholder="Category"
             />
-            <br />
-            <input
+              </div>
+              <div className="col">
+              <input
               type="text"
               name="subCategory"
               value={subCategory}
               onChange={(e) => setSubCategory(e.target.value)}
               placeholder="SubCategory"
             />
+              </div>
+            </div>
+           
             <br />
             <button className="btn btn-dark" onClick={handleUpdateProduct}>Update</button>
             <br />
@@ -152,6 +175,8 @@ export default function EditScreen() {
                     <th className="col">{type.price}</th>
                     <th className="col">{type.quantity}</th>
                     <button
+                    className="btn btn-dark"
+                    style={{backgroundColor:"#212529"}}
                       onClick={() => {
                         navigate(`/product/edittype/${type._id}?id=${id}`);
                       }}
@@ -159,6 +184,7 @@ export default function EditScreen() {
                       Edit
                     </button>
                     <button
+                    className="btn btn-outline-dark"
                       onClick={() => {
                         handleTypeDelete(type._id);
                       }}
@@ -172,48 +198,66 @@ export default function EditScreen() {
 
             {}
 
-            <input
+            <div className="row">
+              <div className="col">
+              <input
               type="text"
               value={type.unit}
               onChange={handleChange}
               name="unit"
               placeholder="unit"
-            />
-            <input
+              />
+              </div>
+              <div className="col">
+              <input
               type="number"
               value={type.size}
               onChange={handleChange}
               name="size"
               placeholder="size"
             />
-            <input
+              </div>
+              <div className="col">
+              <input
               type="number"
               value={type.price}
               onChange={handleChange}
               name="price"
               placeholder="price"
             />
-            <input
+              </div>
+              <div className="col">
+              <input
               type="number"
               value={type.quantity}
               onChange={handleChange}
               name="quantity"
               placeholder="quantity"
             />
+              </div>
+              <div className="col">
+            <button style={{marginTop: "5px"}} className="btn btn-dark" onClick={handleAddType}>Add Type</button>
+              </div>
 
-            <button onClick={handleAddType}>Add Type</button>
+            </div>
+
+            
+            
+            
+            
+
 
             {/* {types.map((type) => (
               <>
-                <h2>Types</h2>
+              <h2>Types</h2>
                 <input
                   type="text"
                   value={type.type}
                   onChange={handleChange}
                   name="type"
                   placeholder="type"
-                />
-                <input
+                  />
+                  <input
                   type="text"
                   value={type.unit}
                   onChange={handleChange}
@@ -246,6 +290,7 @@ export default function EditScreen() {
               </>
             ))} */}
           </div>
+      </div>
         </div>
       )}
     </>

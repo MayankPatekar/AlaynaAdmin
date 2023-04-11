@@ -67,6 +67,13 @@ const updateOrder = async(name)=>{
                         <h3>Shipping details</h3>
                         <div className="row">
                           <div className="col-sm-3">
+                            <h6 className="mb-0">Order Id :</h6>
+                          </div>
+                          <div className="col-sm-9 text-secondary">{order.OrderId}</div>
+                        </div>
+                        <hr />
+                        <div className="row">
+                          <div className="col-sm-3">
                             <h6 className="mb-0">User Email :</h6>
                           </div>
                           <div className="col-sm-9 text-secondary">{user.email}</div>
