@@ -43,16 +43,21 @@ export default function EditTypeScreen() {
   }, [id, typeid]);
 
   const handleUpdateType = async() => {
-    await axios.post(`http://localhost:3004/api/type/post?id=${id}&typeid=${typeid}`,{unit,size,quantity,price}).then((res)=>{
+    if(unit && size && quantity && price){
+
+      await axios.post(`http://localhost:3004/api/type/post?id=${id}&typeid=${typeid}`,{unit,size,quantity,price}).then((res)=>{
         alert(`${res.data.message}`)
         // navigate("/profile")
         
-    }).catch(err=>console.log(err))
+      }).catch(err=>console.log(err))
+    }else{
+      alert("Fill complete details")
+    }
 
   };
 //   const handleAddType = () => {};
   return (
-    <>
+    <div className="container ">
       <h2>Types</h2>
       {/* <input type="text" value={type.type} onChange={handleChange} name="type"  placeholder="type"/> */}
       {unit && (
@@ -91,6 +96,6 @@ export default function EditTypeScreen() {
           <br />
         </>
       )}
-    </>
+    </div>
   );
 }

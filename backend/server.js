@@ -261,10 +261,10 @@ app.post("/signin", async (req, res) => {
       if (isMatch) {
         sendToken(user, 200, res);
       } else {
-        res.status(401).send({ message: "invalidpass" });
+        res.status(401).send({ message: "Invalid password" });
       }
     } else {
-      res.status(401).send({ message: "Invalid Username" });
+      res.status(401).send({ message: "Invalid Email" });
     }
   } catch (err) {
     console.log(err);

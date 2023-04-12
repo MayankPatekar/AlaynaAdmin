@@ -138,7 +138,7 @@ export default function HomeScreen() {
               <div className="icon">
                 <i className="fa fa-money" aria-hidden="true"></i>
               </div>
-              <a href="/viewstac" className="card-box-footer">
+              <a href="/" className="card-box-footer">
                 View More <i className="fa fa-arrow-circle-right"></i>
               </a>
             </div>

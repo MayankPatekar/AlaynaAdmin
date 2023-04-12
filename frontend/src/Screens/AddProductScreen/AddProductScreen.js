@@ -68,6 +68,7 @@ export default function AddProductScreen() {
           .then((res) => {
             console.log(res);
             alert("Product added successfully");
+            window.location.reload(true);
           })
           .catch((err) => {
             console.log(err);
@@ -95,7 +96,9 @@ export default function AddProductScreen() {
   };
   const handleAddType = (e) => {
     // e.preventDefault()
-    setTypes((types) => [...types, type]);
+    if(type.unit && type.size && type.price && type.quantity){
+      setTypes((types) => [...types, type]);
+    }
 
     // console.log(type)
   };

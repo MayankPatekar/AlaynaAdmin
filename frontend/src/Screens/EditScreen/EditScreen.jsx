@@ -37,12 +37,17 @@ export default function EditScreen() {
   }
   const handleAddType = async() => {
     console.log(type)
-    await axios.post(`http://localhost:3004/api/type/add?id=${id}`,{type},config).then((res)=>{
-      alert(`${res.data.message}`)
-      window.location.reload(true);
-      // navigate(`/editproduct/${id}`);
-    })
-    // e.preventDefault()
+    if(type.unit && type.size && type.price && type.quantity){
+
+      await axios.post(`http://localhost:3004/api/type/add?id=${id}`,{type},config).then((res)=>{
+        alert(`${res.data.message}`)
+        window.location.reload(true);
+        // navigate(`/editproduct/${id}`);
+      })
+    }else{
+      alert("Fill complete data")
+    }
+      // e.preventDefault()
     // setTypes((types) => [...types, type]);
     // console.log(type)
   };
