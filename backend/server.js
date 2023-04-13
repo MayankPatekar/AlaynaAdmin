@@ -427,7 +427,15 @@ app.post("/api/order/:id", async (req, res) => {
       order.isPacked = true;
       await order.save();
       console.log(user)
-      const message = `Dear <br/> ${user.fname} ${user.lname},<br><p>Your order id #${order.OrderId} is been packed and <br /> will be delivered to you soon.<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at `+`<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>`+`</p>`+`<h3>Happy shopping,<br/>Havve a great day.</h3>`
+      const message = `Dear <br/> ${user.fname} ${user.lname},<br>
+      <p>Your order id #${order.OrderId} is been packed and 
+      <br /> will be delivered to you soon.
+      <br/>You can check your order status orders page.
+      </p><br/>
+      <p>For any queries contact to us at `
+      +`<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>`
+      +`</p>`
+      +`<h4>Happy shopping,<br/>Have a great day.</h4>`
       await sendEmail({
         to : "mayankpatekar112345@gmail.com",
         subject:`#${order.OrderId} Your Alayna's order is been packed`,
@@ -438,7 +446,15 @@ app.post("/api/order/:id", async (req, res) => {
     else if (changePart === "shipped") {
       order.isShipped = true;
       await order.save();
-      const message = `Dear <br/> <bold>${user.FirstName} ${user.LastName},</bold><br><p>Your order id <bold>#${order.OrderId}</bold> is been shipped and <br /> will be delivered to you soon.<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at <a>alayna2k23@gmail.com</a></p><h6>Happy shopping,<br/>Havve a great day.</h6>`
+      const message = `Dear <br/> <bold>${user.fname} ${user.lname},</bold><br>
+      <p>Your order id <bold>#${order.OrderId}</bold> is been shipped and 
+      <br /> will be delivered to you soon.
+      <br/>You can check your order status orders page.
+      </p><br/>
+      <p>For any queries contact to us at`
+      +`<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>`
+      +`</p>`
+      +`<h4>Happy shopping,<br/>Have a great day.</h4>`
       await sendEmail({
         to : "mayankpatekar112345@gmail.com",
         subject:`#${order.OrderId} Your Alayna's order is been shipped`,
@@ -458,9 +474,26 @@ app.post("/api/order/:id", async (req, res) => {
       await user.save();
       var message;
       if(order.TotalPointsRecived>0){
-        message = `Dear <br/> <bold>${user.FirstName} ${user.LastName},</bold><br><p>Your order id <bold>#${order.OrderId}</bold> is been delivered and <br /> ${order.TotalPointsRecived} points are added to your account.<br/> We hope that you are satisfied by our service.<br/>Check profile section to see how much points you have.<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at <a>alayna2k23@gmail.com</a></p><h6>Happy shopping,<br/>Havve a great day.</h6>`
+        message = `Dear <br/> <bold>${user.fname} ${user.lname},</bold><br>
+        <p>Your order with id No. <bold>#${order.OrderId}</bold> has been delivered and 
+        <br /> ${order.TotalPointsRecived} points are added to your account.
+        <br/>We hope that you are delighted by our service
+
+        <br/>Check profile section to see how much points you have.
+        </p><br/>
+        <p>For any queries contact to us at `
+        +`<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>`
+        +`</p>`
+        +`<h4>Happy shopping,<br/>Have a great day.</h4>`
       }else{
-        message = `Dear <br/> <bold>${user.FirstName} ${user.LastName},</bold><br><p>Your order id <bold>#${order.OrderId}</bold> is been delivered.<br />We hope that you are satisfied by our service..<br/>You can check status under your orders.</p><br/><p>For any queries contact to us at <a>alayna2k23@gmail.com</a></p><h6>Happy shopping,<br/>Havve a great day.</h6>`
+        message = `Dear <br/> <bold>${user.fname} ${user.lname},</bold>
+        <br><p>Your order with id No. <bold>#${order.OrderId}</bold> has been delivered.
+        <br />We hope that you are delighted by our service
+        </p><br/>
+        <p>For any queries contact to us at `
+        +`<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>`
+        +`</p>`+
+        `<h4>Happy shopping,<br/>Have a great day.</h4>`
       }
       
       await sendEmail({
