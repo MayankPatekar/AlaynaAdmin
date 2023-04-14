@@ -15,6 +15,7 @@ export default function EditScreen() {
   //   const [image, setImage] = useState("");
   const [category, setCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");
+  const [timeDate,setTimeDate] = useState("")
   const [type, setType] = useState({
     type: "",
     unit: "",
@@ -63,6 +64,9 @@ export default function EditScreen() {
       setCategory(data.product.Category);
       setSubCategory(data.product.SubCategory);
       setTypes(data.product.Types);
+      var date = new Date(data.product.createdAt)
+      setTimeDate(date.toLocaleDateString());
+      
       // console.log(data.TotalOrders,data.TotalOrderDelivered)
       // console.log(data.product)
     };
@@ -106,6 +110,7 @@ export default function EditScreen() {
 
           <h2>Edit Product</h2>
           <div>
+            <div>Product add date : {timeDate}</div>
             <div className="row">
               <div className="col">
               <input
@@ -198,6 +203,17 @@ export default function EditScreen() {
                     </button>
                   </tr>
                 ))}
+                <tr>
+                  <th>Total</th>
+                  <th></th>
+                  <th></th>
+                  <th>
+                    
+                  {types.map((type)=>type.quantity).reduce((accumulator, currentValue) => accumulator + currentValue, 0)}
+                  
+                  
+                  </th>
+                </tr>
               </tbody>
             </table>
 

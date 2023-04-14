@@ -48,7 +48,7 @@ const config ={
       const {data} = await axios.post("http://localhost:3004/signin",user,config);
       localStorage.setItem("AdminAuthToken",data.token);
       navigate("/")
-      alert(`Wellcome , You are Sign in`)
+      alert(`Welcome, You are Sign in`)
     }catch(error){
       alert(error.response.data.message);
     }
