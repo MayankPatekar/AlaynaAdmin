@@ -6,8 +6,8 @@ import jwt from "jsonwebtoken";
 import cloudinaryModule from "cloudinary";
 const cloudinary = cloudinaryModule.v2;
 import nodemailer from "nodemailer";
-import * as dotenv from 'dotenv' 
-dotenv.config()
+import * as dotenv from "dotenv";
+dotenv.config();
 // import crypto from "crypto";
 // import path from "path";
 
@@ -16,13 +16,10 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 
-mongoose.connect(
-  process.env.mongoose_connect,
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+mongoose.connect(process.env.mongoose_connect, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 const userSchema = new mongoose.Schema(
   {
@@ -181,7 +178,7 @@ const Product = new mongoose.model("Product", productSchema);
 // order schema
 const orderSchema = new mongoose.Schema(
   {
-    OrderId:{type:String,require:true},
+    OrderId: { type: String, require: true },
     Items: [],
     shippingDetails: [],
     userId: String,
@@ -215,35 +212,34 @@ const sendToken = (user, statusCode, res) => {
   res.status(statusCode).send({ message: "success", token });
 };
 
-const sendEmail = (options) =>{
+const sendEmail = (options) => {
   const transporter = nodemailer.createTransport({
-      host: 'smtp.office365.com',
-  port: 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
+    host: "smtp.office365.com",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
       user: process.env.outLook_user, // sender email
-      pass: process.env.outLook_pass // sender password
-  }
+      pass: process.env.outLook_pass, // sender password
+    },
   });
 
   // console.log(options.to)
   const mailOptions = {
-      from : "alaynaweb@outlook.com",
-      to: options.to,
-      subject: options.subject,
-      html:options.text,
+    from: "alaynaweb@outlook.com",
+    to: options.to,
+    subject: options.subject,
+    html: options.text,
   };
 
-  transporter.sendMail(mailOptions,function(err,info){
-      if(err){
-          console.log(err)
-          console.log("error")
-      }else{
-          console.log(info)
-          console.log("info")
-      }
+  transporter.sendMail(mailOptions, function (err, info) {
+    if (err) {
+      console.log(err);
+      console.log("error");
+    } else {
+      console.log(info);
+      console.log("info");
+    }
   });
-  
 };
 // ---------------------------------------------------//
 // ---------------ROUTES-------------------------------//
@@ -353,15 +349,14 @@ app.get("/api/orders", async (req, res) => {
 // view orders by day month year
 app.get("/api/vieworders", async (req, res) => {
   const { type, selectedDate } = req.query;
-console.log(selectedDate)
+  console.log(selectedDate);
   const parsedDate = new Date(selectedDate);
   parsedDate.setHours(0, 0, 0, 0);
   const endofDay = new Date(selectedDate);
   endofDay.setHours(23, 59, 59, 999);
-  console.log(parsedDate)
-  console.log(endofDay)
-  try{
-
+  console.log(parsedDate);
+  console.log(endofDay);
+  try {
     if (type === "Day") {
       const orderList = await Order.find({
         createdAt: {
@@ -385,17 +380,15 @@ console.log(selectedDate)
       const date = new Date(parsedDate);
       const year = date.getFullYear();
       const orderList = await Order.find({
-        $expr: { $eq: [{ $year: '$createdAt' }, year] },
+        $expr: { $eq: [{ $year: "$createdAt" }, year] },
       });
       if (orderList) {
         res.send({ orderList: orderList });
       }
     }
-
-  }catch(err){
-    console.log(err)
+  } catch (err) {
+    console.log(err);
   }
-
 });
 
 // to get particular order by id
@@ -419,89 +412,99 @@ app.post("/api/order/:id", async (req, res) => {
   const id = req.params.id;
   const email = req.body.email;
   const order = await Order.findOne({ _id: id });
-  const user = await User.findOne({email:email})
+  const user = await User.findOne({ email: email });
   if (!order) {
     res.send({ message: "order not found" });
   } else {
     if (changePart === "packed") {
       order.isPacked = true;
       await order.save();
-      console.log(user)
-      const message = `Dear <br/> ${user.fname} ${user.lname},<br>
+      console.log(user);
+      const message =
+        `Dear <br/> ${user.fname} ${user.lname},<br>
       <p>Your order id #${order.OrderId} is been packed and 
       <br /> will be delivered to you soon.
       <br/>You can check your order status orders page.
       </p><br/>
-      <p>For any queries contact to us at `
-      +`<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>`
-      +`</p>`
-      +`<h4>Happy shopping,<br/>Have a great day.</h4>`
+      <p>For any queries contact to us at ` +
+        `<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>` +
+        `</p>` +
+        `<h4>Happy shopping,<br/>Have a great day.</h4>`;
       await sendEmail({
-        to : "mayankpatekar112345@gmail.com",
-        subject:`#${order.OrderId} Your Alayna's order is been packed`,
-        text : message
-    })
+        to: "mayankpatekar112345@gmail.com",
+        subject: `#${order.OrderId} Your Alayna's order is been packed`,
+        text: message,
+      });
       res.send({ message: "Product updated" });
-    } 
-    else if (changePart === "shipped") {
-      order.isShipped = true;
-      await order.save();
-      const message = `Dear <br/> <bold>${user.fname} ${user.lname},</bold><br>
-      <p>Your order id <bold>#${order.OrderId}</bold> is been shipped and 
-      <br /> will be delivered to you soon.
-      <br/>You can check your order status orders page.
-      </p><br/>
-      <p>For any queries contact to us at`
-      +`<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>`
-      +`</p>`
-      +`<h4>Happy shopping,<br/>Have a great day.</h4>`
-      await sendEmail({
-        to : "mayankpatekar112345@gmail.com",
-        subject:`#${order.OrderId} Your Alayna's order is been shipped`,
-        text : message
-    })
-      res.send({ message: "Product updated" });
-    } 
-    else if (changePart === "paid") {
+    } else if (changePart === "shipped") {
+      if (order.isPacked) {
+        order.isShipped = true;
+        await order.save();
+        const message =
+          `Dear <br/> <bold>${user.fname} ${user.lname},</bold><br>
+        <p>Your order id <bold>#${order.OrderId}</bold> is been shipped and 
+        <br /> will be delivered to you soon.
+        <br/>You can check your order status orders page.
+        </p><br/>
+        <p>For any queries contact to us at` +
+          `<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>` +
+          `</p>` +
+          `<h4>Happy shopping,<br/>Have a great day.</h4>`;
+        await sendEmail({
+          to: "mayankpatekar112345@gmail.com",
+          subject: `#${order.OrderId} Your Alayna's order is been shipped`,
+          text: message,
+        });
+        res.send({ message: "Product updated" });
+      } else {
+        res.send({ message: "Can't update" });
+      }
+    } else if (changePart === "paid") {
       order.isPaid = true;
       await order.save();
 
       res.send({ message: "Product updated" });
     } else if (changePart === "delivered") {
-      order.isDelivered = true;
-      await order.save();
-      user.points = user.points + order.TotalPointsRecived;
-      await user.save();
+      if(order.isShipped){
+        order.isDelivered = true;
+        await order.save();
+        user.points = user.points + order.TotalPointsRecived;
+        await user.save();
       var message;
-      if(order.TotalPointsRecived>0){
-        message = `Dear <br/> <bold>${user.fname} ${user.lname},</bold><br>
+      if (order.TotalPointsRecived > 0) {
+        message =
+          `Dear <br/> <bold>${user.fname} ${user.lname},</bold><br>
         <p>Your order with id No. <bold>#${order.OrderId}</bold> has been delivered and 
         <br /> ${order.TotalPointsRecived} points are added to your account.
         <br/>We hope that you are delighted by our service
 
         <br/>Check profile section to see how much points you have.
         </p><br/>
-        <p>For any queries contact to us at `
-        +`<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>`
-        +`</p>`
-        +`<h4>Happy shopping,<br/>Have a great day.</h4>`
-      }else{
-        message = `Dear <br/> <bold>${user.fname} ${user.lname},</bold>
+        <p>For any queries contact to us at ` +
+          `<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>` +
+          `</p>` +
+          `<h4>Happy shopping,<br/>Have a great day.</h4>`;
+      } else {
+        message =
+          `Dear <br/> <bold>${user.fname} ${user.lname},</bold>
         <br><p>Your order with id No. <bold>#${order.OrderId}</bold> has been delivered.
         <br />We hope that you are delighted by our service
         </p><br/>
-        <p>For any queries contact to us at `
-        +`<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>`
-        +`</p>`+
-        `<h4>Happy shopping,<br/>Have a great day.</h4>`
+        <p>For any queries contact to us at ` +
+          `<a href="mailto:alayna2k23@gmail.com">alayna2k23@gmail.com</a>` +
+          `</p>` +
+          `<h4>Happy shopping,<br/>Have a great day.</h4>`;
       }
       
       await sendEmail({
-        to : "mayankpatekar112345@gmail.com",
-        subject:`#${order.OrderId} Your Alayna's order is been delivered`,
-        text : message
-    })
+        to: "mayankpatekar112345@gmail.com",
+        subject: `#${order.OrderId} Your Alayna's order is been delivered`,
+        text: message,
+      });
       res.send({ message: "Product updated" });
+    }else{
+      res.send({message:"Can't update"})
+    }
     }
   }
 });
@@ -574,103 +577,97 @@ app.get("/api/product/:id", async (req, res) => {
 });
 
 // to edit particular(specially quantity) product by id
-app.post("/api/product/:id",async(req, res) => {
+app.post("/api/product/:id", async (req, res) => {
   const id = req.params.id;
   const name = req.body.name;
-  const description = req.body.description
-  const brand = req.body.brand
+  const description = req.body.description;
+  const brand = req.body.brand;
   var category;
-  if(req.body.category.includes(",")){
-     category = req.body.category.split(",")
-  }else{
-     category = req.body.category
+  if (req.body.category.includes(",")) {
+    category = req.body.category.split(",");
+  } else {
+    category = req.body.category;
   }
   // const category = req.body.category
-  const subcategory = req.body.subCategory
-  const product = await Product.findOne({_id:id})
-  product.ProductName=name,
-  product.Description = description,
-  product.ProductBrand = brand,
-  product.Category = category
-  product.SubCategory = subcategory
-  product.save()
-  res.send({message:"Product update successfully"})
+  const subcategory = req.body.subCategory;
+  const product = await Product.findOne({ _id: id });
+  (product.ProductName = name),
+    (product.Description = description),
+    (product.ProductBrand = brand),
+    (product.Category = category);
+  product.SubCategory = subcategory;
+  product.save();
+  res.send({ message: "Product update successfully" });
 });
 
-app.post("/api/productdelete/:id",async(req,res)=>{
+app.post("/api/productdelete/:id", async (req, res) => {
   const id = req.params.id;
-  try{
-console.log(id)
-    await Product.deleteOne({_id:id})
-    res.send({message:"Product delete"})
-  }catch(err){
-    console.log(err)
+  try {
+    console.log(id);
+    await Product.deleteOne({ _id: id });
+    res.send({ message: "Product delete" });
+  } catch (err) {
+    console.log(err);
   }
-})
+});
 
 // ---------------------------------------------------//
 // ----------ALL TYPE RELATED ROUTES---------------//
 // ---------------------------------------------------//
 
 // get type
-app.get("/api/type/get",async(req,res)=>{
-  const {id,typeid} = req.query;
+app.get("/api/type/get", async (req, res) => {
+  const { id, typeid } = req.query;
 
   // console.log(id)
-  try{
-
-    const product = await Product.findOne({_id:id})
-    console.log(product)
-    product.Types.forEach((type)=>{
-      console.log(type._id.toString())
-      if(type._id.toString()===typeid){
+  try {
+    const product = await Product.findOne({ _id: id });
+    console.log(product);
+    product.Types.forEach((type) => {
+      console.log(type._id.toString());
+      if (type._id.toString() === typeid) {
         // console.log("type is here")
-        console.log(type)
-        res.send({Type:type})
+        console.log(type);
+        res.send({ Type: type });
       }
-    })
-  }catch(err){
-    console.log("err")
+    });
+  } catch (err) {
+    console.log("err");
   }
-
-
-})
+});
 // edit type
-app.post("/api/type/post",async(req,res)=>{
-  const {id,typeid} = req.query;
-  const {unit,size,quantity,price} = req.body;
+app.post("/api/type/post", async (req, res) => {
+  const { id, typeid } = req.query;
+  const { unit, size, quantity, price } = req.body;
   // console.log(id," ",typeid)
   // console.log("from backend ")
-  try{
-
-    const product = await Product.findOne({_id:id})
-    product.Types.forEach(async (type)=>{
-      if(type._id.toString()===typeid){
-        type.size = size,
-        type.unit = unit,
-        type.quantity = quantity,
-        type.price = price,
-        await product.save();
-        res.send({message:"Type updated successfully"})
-        
+  try {
+    const product = await Product.findOne({ _id: id });
+    product.Types.forEach(async (type) => {
+      if (type._id.toString() === typeid) {
+        (type.size = size),
+          (type.unit = unit),
+          (type.quantity = quantity),
+          (type.price = price),
+          await product.save();
+        res.send({ message: "Type updated successfully" });
       }
-    })
-  }catch(err){
-    res.send(err)
+    });
+  } catch (err) {
+    res.send(err);
   }
-
-})
+});
 
 // delete type
-app.post("/api/type/delete",async(req,res)=>{
-  const {id,typeid} = req.query;
-  const product = await Product.findOne({_id:id})
-  var typeSize=0; 
-  product.Types.forEach((type)=>{
-    if(type._id.toString()===typeid){
+app.post("/api/type/delete", async (req, res) => {
+  const { id, typeid } = req.query;
+  const product = await Product.findOne({ _id: id });
+  var typeSize = 0;
+  product.Types.forEach((type) => {
+    if (type._id.toString() === typeid) {
       typeSize = type.size;
     }
-  })
+  });
   // console.log(typeSize)
   // Product.updateOne(
   //   { _id: id }, // Filter to match the product document by ID
@@ -683,59 +680,55 @@ app.post("/api/type/delete",async(req,res)=>{
   //   //   console.log('Types object removed:', result);
   //   // }
   // );
-  if(product.Types.length > 1){
-    product.Types = product.Types.filter(type => type.size !== typeSize);
+  if (product.Types.length > 1) {
+    product.Types = product.Types.filter((type) => type.size !== typeSize);
     product.save();
-    res.send({message:"Type delete successfully"})
-
-  }else{
-    res.send({message:"You atleast have to keep one type"})
+    res.send({ message: "Type delete successfully" });
+  } else {
+    res.send({ message: "You atleast have to keep one type" });
   }
   // product.Types.deleteOne({_id:typeid})
-
-})
+});
 // add type
-app.post("/api/type/add",async(req,res)=>{
-  const {id} = req.query;
+app.post("/api/type/add", async (req, res) => {
+  const { id } = req.query;
   // console.log(req.body.type)
   // const {unit,size,price,quantity} = req.body.type;
-  const unit = req.body.type.unit
-  const size = Number(req.body.type.size)
-  const price = Number(req.body.type.price)
-  const quantity = Number(req.body.type.quantity)
+  const unit = req.body.type.unit;
+  const size = Number(req.body.type.size);
+  const price = Number(req.body.type.price);
+  const quantity = Number(req.body.type.quantity);
   // console.log(type)
   // console.log(unit,size,price,quantity)
-  const product = await Product.findOne({_id:id})
-  
-  if(!product.Types){
-    product.Types = []
+  const product = await Product.findOne({ _id: id });
+
+  if (!product.Types) {
+    product.Types = [];
   }
   // product.Types.forEach(type=>{
-    // const yes = product.Types.findOne({size:size})
-    var yes = false; 
-    product.Types.forEach(type=>{
-      if(type.size === size){
-        yes = true
-      }
-    })
-    if(!yes){
-
-     const newType = {
-        // typeNo: 0,
-        unit: unit,
-        size: size,
-        price: price,
-        quantity: quantity,
-      };
-      product.Types.push(newType)
-      product.save();
-      res.send({message:"Type added successfully"})
-    }else{
-      res.send({message:"Type is already exist"})
+  // const yes = product.Types.findOne({size:size})
+  var yes = false;
+  product.Types.forEach((type) => {
+    if (type.size === size) {
+      yes = true;
     }
+  });
+  if (!yes) {
+    const newType = {
+      // typeNo: 0,
+      unit: unit,
+      size: size,
+      price: price,
+      quantity: quantity,
+    };
+    product.Types.push(newType);
+    product.save();
+    res.send({ message: "Type added successfully" });
+  } else {
+    res.send({ message: "Type is already exist" });
+  }
   // })
-
-})
+});
 
 // ---------------------------------------------------//
 // getting info for dashboard
